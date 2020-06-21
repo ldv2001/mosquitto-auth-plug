@@ -606,9 +606,9 @@ int mosquitto_auth_acl_check(void *userdata, int access, const struct mosquitto 
 int mosquitto_auth_acl_check(void *userdata, const char *clientid, const char *username, const char *topic, int access)
 #endif
 {
-	// Since this plugin do not handle aubscription access, we will defer it.
+	// Since this plugin do not handle aubscription access, we will automatically accept.
 	if (access == MOSQ_ACL_SUBSCRIBE) {
-		return MOSQ_ERR_PLUGIN_DEFER;
+		return MOSQ_ERR_SUCCESS;
 	}
 
 	struct userdata *ud = (struct userdata *)userdata;
