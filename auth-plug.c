@@ -497,11 +497,12 @@ int mosquitto_auth_security_cleanup(void *userdata, struct mosquitto_auth_opt *a
 	return MOSQ_ERR_SUCCESS;
 }
 
-
-#if MOSQ_AUTH_PLUGIN_VERSION >=3
+#if MOSQ_AUTH_PLUGIN_VERSION >=4
+int mosquitto_auth_unpwd_check(void *userdata, struct mosquitto *client, const char *username, const char *password)
+#elif MOSQ_AUTH_PLUGIN_VERSION >=3
 int mosquitto_auth_unpwd_check(void *userdata, const struct mosquitto *client, const char *username, const char *password)
 #else
-int mosquitto_auth_unpwd_check(void *userdata, const char *username, const char *password)
+nt mosquitto_auth_unpwd_check(void *userdata, const char *username, const char *password)
 #endif
 {
 	struct userdata *ud = (struct userdata *)userdata;
@@ -597,12 +598,19 @@ int mosquitto_auth_unpwd_check(void *userdata, const char *username, const char 
 	return granted;
 }
 
-#if MOSQ_AUTH_PLUGIN_VERSION >= 3
+#if MOSQ_AUTH_PLUGIN_VERSION >= 4
+int mosquitto_auth_acl_check(void *userdata, int access, struct mosquitto *client, const struct mosquitto_acl_msg *msg)
+#elif MOSQ_AUTH_PLUGIN_VERSION >= 3
 int mosquitto_auth_acl_check(void *userdata, int access, const struct mosquitto *client, const struct mosquitto_acl_msg *msg)
 #else
 int mosquitto_auth_acl_check(void *userdata, const char *clientid, const char *username, const char *topic, int access)
 #endif
 {
+	// Since this plugin do not handle aubscription access, we will defer it.
+	if (access == MOSQ_ACL_SUBSCRIBE) {
+		return MOSQ_ERR_PLUGIN_DEFER;
+	}
+
 	struct userdata *ud = (struct userdata *)userdata;
 	struct backend_p **bep;
 	char *backend_name = NULL;
@@ -747,8 +755,9 @@ int mosquitto_auth_acl_check(void *userdata, const char *clientid, const char *u
 
 }
 
-
-#if MOSQ_AUTH_PLUGIN_VERSION >= 3
+#if MOSQ_AUTH_PLUGIN_VERSION >= 4
+int mosquitto_auth_psk_key_get(void *userdata, struct mosquitto *client, const char *hint, const char *identity, char *key, int max_key_len)
+#elif MOSQ_AUTH_PLUGIN_VERSION >= 3
 int mosquitto_auth_psk_key_get(void *userdata, const struct mosquitto *client, const char *hint, const char *identity, char *key, int max_key_len)
 #else
 int mosquitto_auth_psk_key_get(void *userdata, const char *hint, const char *identity, char *key, int max_key_len)
