@@ -30,8 +30,8 @@ ifneq ($(BACKEND_MYSQL),no)
 	BACKENDS += -DBE_MYSQL
 	BACKENDSTR += MySQL
 
-	BE_CFLAGS += `mysql_config --cflags`
-	BE_LDADD += `mysql_config --libs`
+	BE_CFLAGS += `mariadb_config --cflags`
+	BE_LDADD += `mariadb_config --libs`
 	OBJS += be-mysql.o
 endif
 
